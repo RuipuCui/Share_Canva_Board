@@ -19,4 +19,5 @@ public abstract class DrawableShape implements Serializable {
 
     // For rectangle and oval updates
     public void updateShape(Point p1, Point p2) {}
+
 }

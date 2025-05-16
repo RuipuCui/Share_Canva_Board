@@ -1,11 +1,13 @@
 package Client;
 
-import WhiteBoard.DrawingWhiteBoard;
-import Server.RemoteWhiteBoards;
+import Server.WhiteBoards;
 
 import javax.swing.*;
 import java.awt.*;
 import java.rmi.RemoteException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClientUI {
     public static void main(String[] args) {
@@ -19,18 +21,12 @@ public class ClientUI {
             JTabbedPane tabbedPane = new JTabbedPane();
             frame.add(tabbedPane, BorderLayout.CENTER);
 
-            // === Initial Board ===
-            final RemoteWhiteBoards[] whiteBoardsContainer = new RemoteWhiteBoards[1];
-            try {
-                whiteBoardsContainer[0] = new RemoteWhiteBoards();
-                //RemoteWhiteBoards whiteBoards = whiteBoardsContainer[0];
-            } catch (RemoteException e) {
-                throw new RuntimeException(e);
-            }
+            List<WhiteBoardUI> whiteboardUIS = new ArrayList<>();
 
-//            int[] boardCount = {1};
-//            DrawingWhiteBoard firstBoard = new DrawingWhiteBoard();
-            tabbedPane.addTab("Board " + whiteBoardsContainer[0].getWhiteBoardNum(), whiteBoardsContainer[0].getWhiteBoards().get(0));
+            // === Initial Board ===
+            WhiteBoards whiteBoards = new WhiteBoards();
+
+            tabbedPane.addTab("Board " + whiteBoards.getWhiteBoardNum(), whiteBoards.getWhiteBoards().get(0));
 
             // === Top Tool Bar ===
             JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
@@ -43,7 +39,7 @@ public class ClientUI {
                 btn.setFocusPainted(false);
                 btn.setPreferredSize(new Dimension(100, 30));
                 btn.addActionListener(e -> {
-                    DrawingWhiteBoard selected = (DrawingWhiteBoard) tabbedPane.getSelectedComponent();
+                    WhiteBoardUI selected = (WhiteBoardUI) tabbedPane.getSelectedComponent();
                     selected.setTool(tool);
                 });
                 topBar.add(btn);
@@ -53,16 +49,10 @@ public class ClientUI {
             newBoardBtn.setFocusPainted(false);
             newBoardBtn.setPreferredSize(new Dimension(120, 30));
             newBoardBtn.addActionListener(e -> {
-                //boardCount[0]++;
-                //DrawingWhiteBoard newBoard = new DrawingWhiteBoard();
-                try {
-                    whiteBoardsContainer[0].newWhiteBoard();
-                } catch (RemoteException ex) {
-                    throw new RuntimeException(ex);
-                }
-                int num = whiteBoardsContainer[0].getWhiteBoardNum();
-                tabbedPane.addTab("Board " + num, whiteBoardsContainer[0].getWhiteBoards().get(num - 1));
-                tabbedPane.setSelectedComponent(whiteBoardsContainer[0].getWhiteBoards().get(num - 1));
+                whiteBoards.newWhiteBoard();
+                int num = whiteBoards.getWhiteBoardNum();
+                tabbedPane.addTab("Board " + num, whiteBoards.getWhiteBoards().get(num - 1));
+                tabbedPane.setSelectedComponent(whiteBoards.getWhiteBoards().get(num - 1));
             });
             topBar.add(Box.createHorizontalStrut(20));
             topBar.add(newBoardBtn);
@@ -84,7 +74,7 @@ public class ClientUI {
             saveBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
             saveBtn.setMaximumSize(new Dimension(200, 30));
             saveBtn.addActionListener(e -> {
-                DrawingWhiteBoard canvas = (DrawingWhiteBoard) tabbedPane.getSelectedComponent();
+                WhiteBoardUI canvas = (WhiteBoardUI) tabbedPane.getSelectedComponent();
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setDialogTitle("Save Canvas");
                 if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
@@ -97,7 +87,7 @@ public class ClientUI {
             loadBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
             loadBtn.setMaximumSize(new Dimension(200, 30));
             loadBtn.addActionListener(e -> {
-                DrawingWhiteBoard canvas = (DrawingWhiteBoard) tabbedPane.getSelectedComponent();
+                WhiteBoardUI canvas = (WhiteBoardUI) tabbedPane.getSelectedComponent();
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setDialogTitle("Load Canvas");
                 if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
@@ -110,7 +100,7 @@ public class ClientUI {
             exportBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
             exportBtn.setMaximumSize(new Dimension(200, 30));
             exportBtn.addActionListener(e -> {
-                DrawingWhiteBoard canvas = (DrawingWhiteBoard) tabbedPane.getSelectedComponent();
+                WhiteBoardUI canvas = (WhiteBoardUI) tabbedPane.getSelectedComponent();
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setDialogTitle("Export as Image");
                 fileChooser.setAcceptAllFileFilterUsed(false);

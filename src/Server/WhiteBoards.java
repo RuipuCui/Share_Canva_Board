@@ -1,21 +1,21 @@
 package Server;
 
-import WhiteBoard.DrawingWhiteBoard;
+import Client.WhiteBoardUI;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RemoteWhiteBoards {
+public class WhiteBoards {
 
-    private List<DrawingWhiteBoard> whiteBoards = new ArrayList<>();
+    private List<WhiteBoardUI> whiteBoards = new ArrayList<>();
     private int whiteBoardNum = 0;
-    public RemoteWhiteBoards() throws RemoteException {
+    public WhiteBoards() {
         newWhiteBoard();
     }
 
-    public void newWhiteBoard() throws RemoteException {
-        DrawingWhiteBoard whiteBoard = new DrawingWhiteBoard();
+    public void newWhiteBoard() {
+        WhiteBoardUI whiteBoard = new WhiteBoardUI();
         this.whiteBoards.add(whiteBoard);
         whiteBoardNum ++;
     }
@@ -24,7 +24,7 @@ public class RemoteWhiteBoards {
 
     }
 
-    public List<DrawingWhiteBoard> getWhiteBoards(){
+    public List<WhiteBoardUI> getWhiteBoards(){
         return this.whiteBoards;
     }
 

@@ -1,7 +1,5 @@
-package WhiteBoard;
+package Client;
 
-import RMI.RemoteWhiteBoard;
-import Server.RemoteWhiteBoards;
 import WhiteBoard.DrawableShapes.*;
 import WhiteBoard.DrawableShapes.Rectangle;
 
@@ -12,21 +10,19 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DrawingWhiteBoard extends JPanel implements RemoteWhiteBoard {
+public class WhiteBoardUI extends JPanel {
     private List<DrawableShape> shapes = new ArrayList<>();
     private DrawableShape currentShape = null;
     private String currentTool = "Freehand";
     private Point startPoint;
 
-    public DrawingWhiteBoard() throws RemoteException {
+    public WhiteBoardUI() {
         setBackground(Color.WHITE);
         //loadCanvasFromFile("CanvasFile/Canvas_1.dat");
-        UnicastRemoteObject.exportObject(this, 0);
+        //UnicastRemoteObject.exportObject(this, 0);
 
         MouseAdapter mouseHandler = new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -127,6 +123,5 @@ public class DrawingWhiteBoard extends JPanel implements RemoteWhiteBoard {
             e.printStackTrace();
         }
     }
-
 
 }
