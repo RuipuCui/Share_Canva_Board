@@ -1,9 +1,12 @@
 package Client;
 
+import RMI.RemoteWhiteBoard;
+import RMI.RemoteWhiteBoards;
 import Server.WhiteBoards;
 
 import javax.swing.*;
 import java.awt.*;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
@@ -21,12 +24,22 @@ public class ClientUI {
             JTabbedPane tabbedPane = new JTabbedPane();
             frame.add(tabbedPane, BorderLayout.CENTER);
 
-            List<WhiteBoardUI> whiteboardUIS = new ArrayList<>();
+            RemoteWhiteBoards remoteWhiteBoards;
+            RemoteWhiteBoard firstBoard;
+            try {
+                remoteWhiteBoards = RemoteHandler.getRemoteWhiteBoards();
+                firstBoard = remoteWhiteBoards.getOneWhiteBoard(0);
+            } catch (RemoteException | NotBoundException e) {
+                throw new RuntimeException(e);
+            }
+
+            List<WhiteBoardUI> whiteBoardUIS = new ArrayList<>();
+            whiteBoardUIS.add(new WhiteBoardUI(firstBoard));
 
             // === Initial Board ===
-            WhiteBoards whiteBoards = new WhiteBoards();
+            //WhiteBoards whiteBoards = new WhiteBoards();
 
-            tabbedPane.addTab("Board " + whiteBoards.getWhiteBoardNum(), whiteBoards.getWhiteBoards().get(0));
+            tabbedPane.addTab("Board " + whiteBoardUIS.size(), whiteBoardUIS.getFirst());
 
             // === Top Tool Bar ===
             JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
@@ -49,10 +62,19 @@ public class ClientUI {
             newBoardBtn.setFocusPainted(false);
             newBoardBtn.setPreferredSize(new Dimension(120, 30));
             newBoardBtn.addActionListener(e -> {
-                whiteBoards.newWhiteBoard();
-                int num = whiteBoards.getWhiteBoardNum();
-                tabbedPane.addTab("Board " + num, whiteBoards.getWhiteBoards().get(num - 1));
-                tabbedPane.setSelectedComponent(whiteBoards.getWhiteBoards().get(num - 1));
+                int num = 0;
+                RemoteWhiteBoard currentBoard;
+                try {
+                    remoteWhiteBoards.newWhiteBoard();
+                    num = remoteWhiteBoards.getWhiteBoardNum();
+                    currentBoard = remoteWhiteBoards.getOneWhiteBoard(num - 1);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+                whiteBoardUIS.add(new WhiteBoardUI(currentBoard));
+                tabbedPane.addTab("Board " + num, whiteBoardUIS.get(num - 1));
+                tabbedPane.setSelectedComponent(whiteBoardUIS.get(num - 1));
             });
             topBar.add(Box.createHorizontalStrut(20));
             topBar.add(newBoardBtn);
@@ -79,7 +101,11 @@ public class ClientUI {
                 fileChooser.setDialogTitle("Save Canvas");
                 if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
                     String path = fileChooser.getSelectedFile().getAbsolutePath();
-                    canvas.saveCanvasToFile(path);
+                    try {
+                        canvas.saveCanvasToFile(path);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             });
 
@@ -92,7 +118,11 @@ public class ClientUI {
                 fileChooser.setDialogTitle("Load Canvas");
                 if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
                     String path = fileChooser.getSelectedFile().getAbsolutePath();
-                    canvas.loadCanvasFromFile(path);
+                    try {
+                        canvas.loadCanvasFromFile(path);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             });
 
@@ -117,7 +147,11 @@ public class ClientUI {
                     if (!path.toLowerCase().endsWith("." + format)) {
                         path += "." + format;
                     }
-                    canvas.exportAsImage(path, format);
+                    try {
+                        canvas.exportAsImage(path, format);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             });
 

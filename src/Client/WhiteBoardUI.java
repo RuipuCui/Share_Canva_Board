@@ -1,5 +1,6 @@
 package Client;
 
+import RMI.RemoteWhiteBoard;
 import WhiteBoard.DrawableShapes.*;
 import WhiteBoard.DrawableShapes.Rectangle;
 
@@ -10,19 +11,20 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WhiteBoardUI extends JPanel {
-    private List<DrawableShape> shapes = new ArrayList<>();
+    //private List<DrawableShape> shapes = new ArrayList<>();
     private DrawableShape currentShape = null;
     private String currentTool = "Freehand";
     private Point startPoint;
+    private RemoteWhiteBoard remoteWhiteBoard;
 
-    public WhiteBoardUI() {
+    public WhiteBoardUI(RemoteWhiteBoard remoteWhiteBoard) {
         setBackground(Color.WHITE);
-        //loadCanvasFromFile("CanvasFile/Canvas_1.dat");
-        //UnicastRemoteObject.exportObject(this, 0);
+        this.remoteWhiteBoard = remoteWhiteBoard;
 
         MouseAdapter mouseHandler = new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -61,7 +63,11 @@ public class WhiteBoardUI extends JPanel {
 
             public void mouseReleased(MouseEvent e) {
                 if (currentShape != null) {
-                    shapes.add(currentShape);
+                    try {
+                        remoteWhiteBoard.addShape(currentShape);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     currentShape = null;
                     repaint();
                     //saveCanvasToFile("CanvasFile/Canvas_1.dat");
@@ -81,8 +87,12 @@ public class WhiteBoardUI extends JPanel {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        for (DrawableShape s : shapes) {
-            s.draw(g2);
+        try {
+            for (DrawableShape s : this.remoteWhiteBoard.getShapes()) {
+                s.draw(g2);
+            }
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
         }
 
         if (currentShape != null) {
@@ -90,38 +100,18 @@ public class WhiteBoardUI extends JPanel {
         }
     }
 
-    public void saveCanvasToFile(String path) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path))) {
-            oos.writeObject(shapes);
-            System.out.println("Canvas saved.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void saveCanvasToFile(String path) throws RemoteException {
+        this.remoteWhiteBoard.saveCanvasToFile(path);
     }
 
     @SuppressWarnings("unchecked")
-    public void loadCanvasFromFile(String path) {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path))) {
-            shapes = (List<DrawableShape>) ois.readObject();
-            repaint();
-            System.out.println("Canvas loaded.");
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public void loadCanvasFromFile(String path) throws RemoteException {
+        this.remoteWhiteBoard.loadCanvasFromFile(path);
+        repaint();
     }
 
-    public void exportAsImage(String path, String format) {
-        BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = image.createGraphics();
-        paint(g2);
-        g2.dispose();
-
-        try {
-            ImageIO.write(image, format, new File(path));
-            System.out.println("Canvas exported as " + format.toUpperCase() + " to " + path);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void exportAsImage(String path, String format) throws RemoteException {
+        this.remoteWhiteBoard.exportAsImage(path, format, getWidth(), getHeight());
     }
 
 }

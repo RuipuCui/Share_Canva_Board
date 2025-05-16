@@ -1,0 +1,4 @@
+javac -d bin src/**/*.java
+rmiregistry 9099
+java -cp bin -Djava.rmi.server.codebase=file:./bin/Client/ClientUI Client.ClientUI
+java -cp bin -Djava.rmi.server.codebase=file:./bin/Server/RMIServer Server.RMIServer

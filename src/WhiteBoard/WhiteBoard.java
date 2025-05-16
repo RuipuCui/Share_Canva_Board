@@ -49,12 +49,12 @@ public class WhiteBoard extends UnicastRemoteObject implements RemoteWhiteBoard 
         }
     }
 
-    public void exportAsImage(String path, String format) {
-        BufferedImage image = new BufferedImage(760, 720, BufferedImage.TYPE_INT_ARGB);
+    public void exportAsImage(String path, String format, int width, int height) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = image.createGraphics();
 
         g2.setColor(Color.WHITE);
-        g2.fillRect(0, 0, 760, 720);
+        g2.fillRect(0, 0, width, height);
 
         for (DrawableShape shape : shapes) {
             shape.draw(g2);
