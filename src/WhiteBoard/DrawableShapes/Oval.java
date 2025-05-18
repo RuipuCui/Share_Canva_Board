@@ -7,8 +7,9 @@ import java.awt.geom.Ellipse2D;
 public class Oval extends DrawableShape {
     private Ellipse2D oval;
 
-    public Oval(Point start) {
+    public Oval(Point start, Color color) {
         oval = new Ellipse2D.Double(start.x, start.y, 0, 0);
+        setColor(color);
     }
 
     public void updateShape(Point p1, Point p2) {

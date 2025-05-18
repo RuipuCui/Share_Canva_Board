@@ -5,8 +5,9 @@ import java.awt.geom.Line2D;
 
 public class Line extends DrawableShape {
     private Line2D line;
-    public Line(Point start) {
+    public Line(Point start, Color color) {
         line = new Line2D.Double(start, start);
+        setColor(color);
     }
 
     public void updateShape(Point p1, Point p2) {

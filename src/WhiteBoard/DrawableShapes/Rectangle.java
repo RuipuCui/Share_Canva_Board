@@ -7,8 +7,9 @@ import java.awt.geom.Rectangle2D;
 public class Rectangle extends DrawableShape {
     private Rectangle2D rect;
 
-    public Rectangle(Point start) {
+    public Rectangle(Point start, Color color) {
         rect = new Rectangle2D.Double(start.x, start.y, 0, 0);
+        setColor(color);
     }
 
     public void updateShape(Point p1, Point p2) {

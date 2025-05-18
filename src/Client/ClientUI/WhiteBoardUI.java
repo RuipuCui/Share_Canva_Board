@@ -23,6 +23,7 @@ public class WhiteBoardUI extends JPanel {
     private RemoteWhiteBoard remoteWhiteBoard;
     private int eraserSize = 10;
     private Point mousePosition = null;
+    private Color currentColor = Color.BLACK;
 
 
     public WhiteBoardUI(RemoteWhiteBoard remoteWhiteBoard) {
@@ -39,20 +40,20 @@ public class WhiteBoardUI extends JPanel {
 
                 switch (currentTool) {
                     case "Freehand":
-                        currentShape = new Path();
+                        currentShape = new Path(currentColor);
                         ((Path) currentShape).addPoint(startPoint);
                         break;
                     case "Rectangle":
-                        currentShape = new Rectangle(startPoint);
+                        currentShape = new Rectangle(startPoint, currentColor);
                         break;
                     case "Oval":
-                        currentShape = new Oval(startPoint);
+                        currentShape = new Oval(startPoint, currentColor);
                         break;
                     case "Triangle":
-                        currentShape = new Triangle(startPoint);
+                        currentShape = new Triangle(startPoint, currentColor);
                         break;
                     case "Line":
-                        currentShape = new Line(startPoint);
+                        currentShape = new Line(startPoint, currentColor);
                         break;
                 }
             }
@@ -170,5 +171,13 @@ public class WhiteBoardUI extends JPanel {
     public void setEraserSize(int newSize) {
         this.eraserSize = newSize;
         repaint();
+    }
+
+    public Color getCurrentColor(){
+        return currentColor;
+    }
+
+    public void setCurrentColor(Color color){
+        this.currentColor = color;
     }
 }

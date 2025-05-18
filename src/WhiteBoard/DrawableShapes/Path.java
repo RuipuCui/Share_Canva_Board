@@ -8,6 +8,10 @@ import java.awt.geom.Path2D;
 public class Path extends DrawableShape {
     private Path2D path = new Path2D.Double();
 
+    public Path(Color color){
+        setColor(color);
+    }
+
     public void addPoint(Point p) {
         if (path.getCurrentPoint() == null) {
             path.moveTo(p.x, p.y);

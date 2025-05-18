@@ -20,6 +20,10 @@ public abstract class DrawableShape implements Serializable {
         return id;
     }
 
+    public void setColor(Color color){
+        this.color = color;
+    };
+
     public abstract void draw(Graphics2D g2);
 
     // For rectangle and oval updates

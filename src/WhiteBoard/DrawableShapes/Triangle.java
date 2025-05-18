@@ -7,10 +7,11 @@ import java.awt.geom.Ellipse2D;
 public class Triangle extends DrawableShape {
     private Polygon triangle = new Polygon();
 
-    public Triangle(Point start) {
+    public Triangle(Point start, Color color) {
         triangle.addPoint(start.x, start.y);
         triangle.addPoint(start.x, start.y);
         triangle.addPoint(start.x, start.y);
+        setColor(color);
     }
 
     public void updateShape(Point p1, Point p2) {
