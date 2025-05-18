@@ -13,7 +13,7 @@ public interface RemoteWhiteBoards extends Remote {
     public RemoteWhiteBoard getOneWhiteBoard(int index) throws RemoteException;
     public void sendChatMessage(String name, String message) throws RemoteException;
     public List<String> getChatMessages() throws RemoteException;
-    public abstract boolean addUser(String username) throws RemoteException;
+    public abstract void addUser(String username) throws RemoteException;
     public abstract List<String> getUsers() throws RemoteException;
     public abstract void removeUser(String username) throws RemoteException;
     public abstract void sendGroupMessage(String message) throws RemoteException;
@@ -22,4 +22,5 @@ public interface RemoteWhiteBoards extends Remote {
     public abstract void removeWaitingUser(String username) throws RemoteException;
     public abstract void approveUser(String username) throws RemoteException;
     public abstract void kickUser(String username) throws RemoteException;
+    public abstract boolean checkPermission(String username) throws RemoteException;
 }

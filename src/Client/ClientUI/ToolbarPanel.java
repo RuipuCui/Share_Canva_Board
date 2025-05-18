@@ -6,10 +6,11 @@ import RMI.RemoteWhiteBoards;
 import javax.swing.*;
 import java.awt.*;
 
+import java.rmi.RemoteException;
 import java.util.List;
 
 public class ToolbarPanel extends JPanel {
-    public ToolbarPanel(RemoteWhiteBoards remoteWhiteBoards, List<WhiteBoardUI> whiteBoards, JTabbedPane tabbedPane) {
+    public ToolbarPanel(RemoteWhiteBoards remoteWhiteBoards, List<WhiteBoardUI> whiteBoards, JTabbedPane tabbedPane, RemoteWhiteBoards remote, String username) {
         setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
         setBackground(new Color(245, 245, 245));
         setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
@@ -99,12 +100,24 @@ public class ToolbarPanel extends JPanel {
         }
 
 
-        JButton newBoardBtn = getNewBoardBtn(remoteWhiteBoards, whiteBoards, tabbedPane);
+        JButton newBoardBtn = getNewBoardBtn(remoteWhiteBoards, whiteBoards, tabbedPane, remote, username);
         add(Box.createHorizontalStrut(20));
         add(newBoardBtn);
 
         JButton userMgmtBtn = new JButton("User Management");
         userMgmtBtn.addActionListener(e -> {
+            try {
+                if (!remote.checkPermission(username)) {
+                    JOptionPane.showMessageDialog(null,
+                            "Only the manager can perform this action.",
+                            "Permission Denied",
+                            JOptionPane.ERROR_MESSAGE);
+                    return; // ❗ Skip the rest
+                }
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+
             SwingUtilities.invokeLater(() -> {
                 new UserManagementDialog(remoteWhiteBoards, tabbedPane.getTopLevelAncestor());
             });
@@ -113,10 +126,22 @@ public class ToolbarPanel extends JPanel {
 
     }
 
-    private static JButton getNewBoardBtn(RemoteWhiteBoards remoteWhiteBoards, List<WhiteBoardUI> whiteBoards, JTabbedPane tabbedPane) {
+    private static JButton getNewBoardBtn(RemoteWhiteBoards remoteWhiteBoards, List<WhiteBoardUI> whiteBoards, JTabbedPane tabbedPane, RemoteWhiteBoards remote, String username) {
         JButton newBoardBtn = new JButton("+ New Board");
         newBoardBtn.addActionListener(e -> {
             try {
+                try {
+                    if (!remote.checkPermission(username)) {
+                        JOptionPane.showMessageDialog(null,
+                                "Only the manager can perform this action.",
+                                "Permission Denied",
+                                JOptionPane.ERROR_MESSAGE);
+                        return; // ❗ Skip the rest
+                    }
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+
                 remoteWhiteBoards.newWhiteBoard();
                 int num = remoteWhiteBoards.getWhiteBoardNum();
                 RemoteWhiteBoard board = remoteWhiteBoards.getOneWhiteBoard(num - 1);

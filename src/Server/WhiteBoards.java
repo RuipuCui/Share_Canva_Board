@@ -16,6 +16,7 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
     private int whiteBoardNum = 0;
     private List<String> users = new ArrayList<>();
     private List<String> waitingUsers = new ArrayList<>();
+    private String managerName = null;
     public WhiteBoards() throws RemoteException {
         newWhiteBoard();
     }
@@ -53,12 +54,11 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
         return this.chat;
     }
 
-    public synchronized boolean addUser(String username){
-        if(users.contains(username)){
-            return false;
+    public synchronized void addUser(String username){
+        if(managerName == null){
+            managerName = username;
         }
         users.add(username);
-        return true;
     }
 
     public synchronized void removeUser(String username){
@@ -92,6 +92,10 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
 
     public synchronized void kickUser(String username){
         removeUser(username);
+    }
+
+    public boolean checkPermission(String username){
+        return managerName.equals(username);
     }
 
 

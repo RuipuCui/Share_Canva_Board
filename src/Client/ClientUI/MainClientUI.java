@@ -29,7 +29,7 @@ public class MainClientUI {
                     tabbedPane.addTab("Board " + (i + 1), ui);
                 }
 
-                frame.add(new ToolbarPanel(remote, whiteBoards, tabbedPane), BorderLayout.NORTH);
+                frame.add(new ToolbarPanel(remote, whiteBoards, tabbedPane, remote, username), BorderLayout.NORTH);
                 frame.add(tabbedPane, BorderLayout.CENTER);
 
                 JPanel sidebar = new JPanel();
@@ -38,7 +38,7 @@ public class MainClientUI {
                 sidebar.setBackground(new Color(250, 250, 255));
 
                 // Add FilePanel and ChatPanel
-                sidebar.add(new FilePanel(tabbedPane, frame));
+                sidebar.add(new FilePanel(tabbedPane, frame, remote, username));
                 sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
                 sidebar.add(new ChatPanel(remote, username));
                 sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
