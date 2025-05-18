@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoards{
-
+    private List<String> chat = new ArrayList<>();
     private List<RemoteWhiteBoard> whiteBoards = new ArrayList<>();
     private int whiteBoardNum = 0;
     public WhiteBoards() throws RemoteException {
@@ -41,6 +41,12 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
         return this.whiteBoards.get(index);
     }
 
+    public void sendChatMessage(String name, String message){
+        this.chat.add(name + ": " + message);
+    }
 
+    public List<String> getChatMessages(){
+        return this.chat;
+    }
 
 }

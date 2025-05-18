@@ -69,4 +69,5 @@ public class WhiteBoard extends UnicastRemoteObject implements RemoteWhiteBoard 
             e.printStackTrace();
         }
     }
+
 }

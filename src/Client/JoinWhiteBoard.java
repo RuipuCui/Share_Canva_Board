@@ -1,4 +1,3 @@
-// JoinWhiteBoard.java
 package Client;
 
 public class JoinWhiteBoard {

@@ -94,11 +94,11 @@ public class ClientUI {
             sidebar.add(exportBtn);
             sidebar.add(Box.createRigidArea(new Dimension(0, 30)));
 
-            JLabel chatLabel = new JLabel("Chat (Coming Soon)");
+            JLabel chatLabel = new JLabel("Chat");
             chatLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
             chatLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            JTextArea chatArea = new JTextArea(12, 20);
+            final JTextArea chatArea = new JTextArea(12, 20);
             chatArea.setLineWrap(true);
             chatArea.setWrapStyleWord(true);
             chatArea.setEditable(false);
@@ -113,6 +113,42 @@ public class ClientUI {
             sidebar.add(chatLabel);
             sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
             sidebar.add(chatScroll);
+
+            JPanel chatInputPanel = new JPanel();
+            chatInputPanel.setLayout(new BoxLayout(chatInputPanel, BoxLayout.X_AXIS));
+            chatInputPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            chatInputPanel.setMaximumSize(new Dimension(200, 30));
+            chatInputPanel.setBackground(new Color(250, 250, 255));
+
+            JTextField chatInput = new JTextField();
+            chatInput.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
+
+            JButton sendButton = new JButton("Send");
+            sendButton.setPreferredSize(new Dimension(60, 30));
+
+            chatInputPanel.add(chatInput);
+            chatInputPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+            chatInputPanel.add(sendButton);
+
+            // Add to sidebar
+            sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+            sidebar.add(chatInputPanel);
+
+            // Send message using RMI
+            sendButton.addActionListener(e -> {
+                String message = chatInput.getText().trim();
+                if (!message.isEmpty()) {
+                    try {
+                        remoteWhiteBoards.sendChatMessage(username, message);
+                        System.out.println(username + "message sent");
+                        chatInput.setText("");
+                    } catch (RemoteException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+            chatInput.addActionListener(e -> sendButton.doClick());  // Support Enter key
+
 
             frame.add(sidebar, BorderLayout.WEST);
             // === Polling thread to detect new whiteboards added on the server ===
@@ -143,6 +179,33 @@ public class ClientUI {
                     }
                 }
             }).start();
+
+            // === Chat polling thread (fetches chat history from server) ===
+            new Thread(() -> {
+                List<String> previousMessages = new ArrayList<>();
+
+                while (true) {
+                    try {
+                        Thread.sleep(1000); // Poll every second
+
+                        List<String> serverMessages = remoteWhiteBoards.getChatMessages();
+                        if (!serverMessages.equals(previousMessages)) {
+                            previousMessages = new ArrayList<>(serverMessages);  // defensive copy
+                            SwingUtilities.invokeLater(() -> {
+                                chatArea.setText("");
+                                for (String msg : serverMessages) {
+                                    chatArea.append(msg + "\n");
+                                }
+                            });
+                        }
+
+                    } catch (RemoteException | InterruptedException e) {
+                        System.err.println("Chat polling error: " + e.getMessage());
+                        break;
+                    }
+                }
+            }).start();
+
 
             frame.setVisible(true);
         });

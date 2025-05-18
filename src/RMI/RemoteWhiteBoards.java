@@ -10,4 +10,6 @@ public interface RemoteWhiteBoards extends Remote {
     public List<RemoteWhiteBoard> getWhiteBoards() throws RemoteException;
     public int getWhiteBoardNum() throws RemoteException;
     public RemoteWhiteBoard getOneWhiteBoard(int index) throws RemoteException;
+    public void sendChatMessage(String name, String message) throws RemoteException;
+    public List<String> getChatMessages() throws RemoteException;
 }
