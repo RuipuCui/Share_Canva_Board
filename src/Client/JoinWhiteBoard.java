@@ -1,5 +1,7 @@
 package Client;
 
+import Client.ClientUI.MainClientUI;
+
 public class JoinWhiteBoard {
     public static void main(String[] args) {
         if (args.length != 3) {
@@ -13,7 +15,7 @@ public class JoinWhiteBoard {
 
         try {
             System.out.println("Joining whiteboard as '" + username + "'...");
-            ClientUI.launchUI(ip, port, username, false);  // isManager = false
+            MainClientUI.launchUI(ip, port, username, false);  // isManager = false
         } catch (Exception e) {
             e.printStackTrace();
         }

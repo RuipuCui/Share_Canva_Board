@@ -1,15 +1,11 @@
-package Client;
+package Client.ClientUI;
 
 import RMI.RemoteWhiteBoard;
 import RMI.RemoteWhiteBoards;
-import Server.WhiteBoards;
 
 import javax.swing.*;
 import java.awt.*;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ToolbarPanel extends JPanel {
@@ -28,6 +24,12 @@ public class ToolbarPanel extends JPanel {
             add(btn);
         }
 
+        JButton newBoardBtn = getNewBoardBtn(remoteWhiteBoards, whiteBoards, tabbedPane);
+        add(Box.createHorizontalStrut(20));
+        add(newBoardBtn);
+    }
+
+    private static JButton getNewBoardBtn(RemoteWhiteBoards remoteWhiteBoards, List<WhiteBoardUI> whiteBoards, JTabbedPane tabbedPane) {
         JButton newBoardBtn = new JButton("+ New Board");
         newBoardBtn.addActionListener(e -> {
             try {
@@ -42,8 +44,7 @@ public class ToolbarPanel extends JPanel {
                 ex.printStackTrace();
             }
         });
-        add(Box.createHorizontalStrut(20));
-        add(newBoardBtn);
+        return newBoardBtn;
     }
 }
 

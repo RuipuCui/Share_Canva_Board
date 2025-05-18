@@ -1,15 +1,10 @@
-package Client;
+package Client.ClientUI;
 
 import RMI.RemoteWhiteBoard;
 import RMI.RemoteWhiteBoards;
-import Server.WhiteBoards;
 
 import javax.swing.*;
-import java.awt.*;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class WhiteboardPoller implements Runnable {

@@ -1,16 +1,8 @@
-package Client;
-
-import RMI.RemoteWhiteBoard;
-import RMI.RemoteWhiteBoards;
-import Server.WhiteBoards;
+package Client.ClientUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class FilePanel extends JPanel {
     public FilePanel(JTabbedPane tabbedPane, JFrame frame) {

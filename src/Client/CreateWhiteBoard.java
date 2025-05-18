@@ -1,6 +1,7 @@
 // CreateWhiteBoard.java
 package Client;
 
+import Client.ClientUI.MainClientUI;
 import RMI.RemoteWhiteBoards;
 import Server.WhiteBoards;
 
@@ -25,7 +26,7 @@ public class CreateWhiteBoard {
 
             System.out.println("WhiteBoard Manager '" + username + "' started at " + ip + ":" + port);
             Thread.sleep(500);
-            ClientUI.launchUI(ip, port, username, true);  // isManager = true
+            MainClientUI.launchUI(ip, port, username, true);  // isManager = true
         } catch (Exception e) {
             e.printStackTrace();
         }

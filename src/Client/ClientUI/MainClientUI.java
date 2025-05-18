@@ -1,18 +1,14 @@
-package Client;
+package Client.ClientUI;
 
-import RMI.RemoteWhiteBoard;
 import RMI.RemoteWhiteBoards;
-import Server.WhiteBoards;
 
 import javax.swing.*;
 import java.awt.*;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClientUI {
+public class MainClientUI {
     public static void launchUI(String ip, int port, String username, boolean isManager) {
         SwingUtilities.invokeLater(() -> {
             try {

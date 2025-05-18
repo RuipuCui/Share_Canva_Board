@@ -1,4 +1,4 @@
-package Client;
+package Client.ClientUI;
 
 import RMI.RemoteWhiteBoard;
 import RMI.RemoteWhiteBoards;

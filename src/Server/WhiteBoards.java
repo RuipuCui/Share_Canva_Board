@@ -1,11 +1,9 @@
 package Server;
 
-import Client.WhiteBoardUI;
 import RMI.RemoteWhiteBoard;
 import RMI.RemoteWhiteBoards;
 import WhiteBoard.WhiteBoard;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
