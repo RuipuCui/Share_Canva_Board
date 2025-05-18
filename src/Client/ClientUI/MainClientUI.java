@@ -1,5 +1,7 @@
 package Client.ClientUI;
 
+import Client.ClientUI.Poller.UserKickPoller;
+import Client.ClientUI.Poller.WhiteboardPoller;
 import RMI.RemoteWhiteBoards;
 
 import javax.swing.*;
@@ -42,13 +44,11 @@ public class MainClientUI {
                 sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
                 sidebar.add(new CollaboratorPanel(remote));
 
-
-
                 frame.add(sidebar, BorderLayout.WEST);
 
-
-
                 new Thread(new WhiteboardPoller(remote, whiteBoards, tabbedPane)).start();
+                new Thread(new UserKickPoller(remote, username, frame)).start();
+
                 frame.setVisible(true);
 
             } catch (Exception e) {

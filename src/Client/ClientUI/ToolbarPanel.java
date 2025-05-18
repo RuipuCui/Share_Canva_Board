@@ -102,6 +102,15 @@ public class ToolbarPanel extends JPanel {
         JButton newBoardBtn = getNewBoardBtn(remoteWhiteBoards, whiteBoards, tabbedPane);
         add(Box.createHorizontalStrut(20));
         add(newBoardBtn);
+
+        JButton userMgmtBtn = new JButton("User Management");
+        userMgmtBtn.addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> {
+                new UserManagementDialog(remoteWhiteBoards, tabbedPane.getTopLevelAncestor());
+            });
+        });
+        add(userMgmtBtn);
+
     }
 
     private static JButton getNewBoardBtn(RemoteWhiteBoards remoteWhiteBoards, List<WhiteBoardUI> whiteBoards, JTabbedPane tabbedPane) {

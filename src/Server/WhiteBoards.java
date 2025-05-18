@@ -15,6 +15,7 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
     private List<RemoteWhiteBoard> whiteBoards = new ArrayList<>();
     private int whiteBoardNum = 0;
     private List<String> users = new ArrayList<>();
+    private List<String> waitingUsers = new ArrayList<>();
     public WhiteBoards() throws RemoteException {
         newWhiteBoard();
     }
@@ -66,6 +67,31 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
 
     public synchronized List<String> getUsers(){
         return users;
+    }
+
+    public synchronized boolean addUserToWaiting(String username){
+        if(users.contains(username) || waitingUsers.contains(username)){
+            return false;
+        }
+        waitingUsers.add(username);
+        return true;
+    }
+
+    public synchronized List<String> getWaitingUsers(){
+        return waitingUsers;
+    }
+
+    public synchronized void removeWaitingUser(String username){
+        waitingUsers.remove(username);
+    }
+
+    public synchronized void approveUser(String username){
+        addUser(username);
+        removeWaitingUser(username);
+    }
+
+    public synchronized void kickUser(String username){
+        removeUser(username);
     }
 
 

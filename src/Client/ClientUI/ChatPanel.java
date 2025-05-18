@@ -1,5 +1,6 @@
 package Client.ClientUI;
 
+import Client.ClientUI.Poller.ChatPoller;
 import RMI.RemoteWhiteBoard;
 import RMI.RemoteWhiteBoards;
 import Server.WhiteBoards;
@@ -78,23 +79,7 @@ public class ChatPanel extends JPanel {
         input.addActionListener(e -> send.doClick()); // press Enter to send
 
         // === Polling Thread ===
-        new Thread(() -> {
-            List<String> previous = new ArrayList<>();
-            while (true) {
-                try {
-                    Thread.sleep(1000);
-                    List<String> current = remoteWhiteBoards.getChatMessages();
-                    if (!current.equals(previous)) {
-                        previous = new ArrayList<>(current);
-                        SwingUtilities.invokeLater(() -> {
-                            chatArea.setText(String.join("\n", current));
-                        });
-                    }
-                } catch (Exception e) {
-                    System.err.println("Chat polling error: " + e.getMessage());
-                }
-            }
-        }).start();
+        new Thread(new ChatPoller(remoteWhiteBoards, chatArea)).start();
     }
 }
 

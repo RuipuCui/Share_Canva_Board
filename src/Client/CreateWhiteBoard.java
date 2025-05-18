@@ -9,6 +9,10 @@ import javax.swing.*;
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 
+import java.awt.*;
+import java.util.List;
+
+
 public class CreateWhiteBoard {
     public static void main(String[] args) {
         LaunchUI.createAndShow(config -> {
@@ -78,8 +82,9 @@ public class CreateWhiteBoard {
                 throw new Exception("Could not connect to whiteboard server.");
             }
 
-            boolean success = remote.addUser(username);
-            if (!success) {
+            boolean added = remote.addUserToWaiting(username);  // Adds to waiting list
+            remote.sendGroupMessage(username + " apply for joining, please check user management");
+            if (!added) {
                 JOptionPane.showMessageDialog(
                         null,
                         "The username '" + username + "' is already in use.\nPlease choose a different one.",
@@ -97,8 +102,76 @@ public class CreateWhiteBoard {
                 return;
             }
 
-            remote.sendGroupMessage("Welcome user " + username + " join!");
-            MainClientUI.launchUI(ip, port, username, false, remote);  // isManager = false
+            // Show waiting dialog
+            JDialog waitingDialog = new JDialog((Frame) null, "Waiting for Approval", true);
+            waitingDialog.setSize(300, 120);
+            waitingDialog.setLocationRelativeTo(null);
+            waitingDialog.setLayout(new BorderLayout());
+            waitingDialog.add(new JLabel("Waiting for manager approval...", SwingConstants.CENTER), BorderLayout.CENTER);
+            waitingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+            // Polling thread
+            new Thread(() -> {
+                while (true) {
+                    try {
+                        List<String> approvedUsers = remote.getUsers();
+                        List<String> waitingUsers = remote.getWaitingUsers();
+
+                        if (approvedUsers.contains(username)) {
+                            waitingDialog.dispose();
+                            SwingUtilities.invokeLater(() ->
+                                    MainClientUI.launchUI(ip, port, username, false, remote)
+                            );
+                            break;
+                        }
+
+                        if (!waitingUsers.contains(username)) {
+                            // The user was kicked or rejected
+                            SwingUtilities.invokeLater(() -> {
+                                waitingDialog.dispose();
+                                JOptionPane.showMessageDialog(
+                                        null,
+                                        "You have been removed or rejected by the manager.",
+                                        "Access Denied",
+                                        JOptionPane.WARNING_MESSAGE
+                                );
+                                LaunchUI.createAndShow(config -> {
+                                    if (config.isManager) {
+                                        CreateWhiteBoard.launchWhiteBoard(config.ip, config.port, config.username);
+                                    } else {
+                                        joinWhiteBoard(config.ip, config.port, config.username);
+                                    }
+                                });
+                            });
+                            break;
+                        }
+
+                        Thread.sleep(1000); // Poll every second
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(
+                                    null,
+                                    "Connection lost or manager rejected your request.",
+                                    "Connection Error",
+                                    JOptionPane.ERROR_MESSAGE
+                            );
+                            waitingDialog.dispose();
+                            LaunchUI.createAndShow(config -> {
+                                if (config.isManager) {
+                                    CreateWhiteBoard.launchWhiteBoard(config.ip, config.port, config.username);
+                                } else {
+                                    joinWhiteBoard(config.ip, config.port, config.username);
+                                }
+                            });
+                        });
+                        break;
+                    }
+                }
+            }).start();
+
+            waitingDialog.setVisible(true);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,6 +191,7 @@ public class CreateWhiteBoard {
             });
         }
     }
+
 
 
 }
