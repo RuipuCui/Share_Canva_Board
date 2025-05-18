@@ -60,6 +60,10 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
         return true;
     }
 
+    public synchronized void removeUser(String username){
+        users.remove(username);
+    }
+
     public synchronized List<String> getUsers(){
         return users;
     }

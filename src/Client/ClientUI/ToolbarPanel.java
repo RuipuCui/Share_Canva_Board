@@ -115,6 +115,8 @@ public class ToolbarPanel extends JPanel {
                 whiteBoards.add(ui);
                 tabbedPane.addTab("Board " + num, ui);
                 tabbedPane.setSelectedComponent(ui);
+
+                remoteWhiteBoards.sendGroupMessage("Manager created a new board " + num);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
