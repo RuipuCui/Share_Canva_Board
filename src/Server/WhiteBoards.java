@@ -7,12 +7,14 @@ import WhiteBoard.WhiteBoard;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoards{
     private List<String> chat = new ArrayList<>();
     private List<RemoteWhiteBoard> whiteBoards = new ArrayList<>();
     private int whiteBoardNum = 0;
+    private List<String> users = new ArrayList<>();
     public WhiteBoards() throws RemoteException {
         newWhiteBoard();
     }
@@ -24,7 +26,6 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
     }
 
     public synchronized void removeWhiteBoard(){
-
     }
 
     public synchronized List<RemoteWhiteBoard> getWhiteBoards(){
@@ -39,12 +40,24 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
         return this.whiteBoards.get(index);
     }
 
-    public void sendChatMessage(String name, String message){
+    public synchronized void sendChatMessage(String name, String message){
         this.chat.add(name + ": " + message);
     }
 
-    public List<String> getChatMessages(){
+    public synchronized List<String> getChatMessages(){
         return this.chat;
+    }
+
+    public synchronized boolean addUser(String username){
+        if(users.contains(username)){
+            return false;
+        }
+        users.add(username);
+        return true;
+    }
+
+    public synchronized List<String> getUsers(){
+        return users;
     }
 
 }

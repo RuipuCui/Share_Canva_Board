@@ -2,14 +2,17 @@
 package Client;
 
 import Client.ClientUI.MainClientUI;
+import Client.ClientUI.RemoteHandler;
 import RMI.RemoteWhiteBoards;
 import Server.WhiteBoards;
 
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
+import java.util.UUID;
 
 public class CreateWhiteBoard {
     public static void main(String[] args) {
+
         if (args.length != 3) {
             System.out.println("Usage: java CreateWhiteBoard <serverIP> <serverPort> <username>");
             return;
@@ -26,7 +29,9 @@ public class CreateWhiteBoard {
 
             System.out.println("WhiteBoard Manager '" + username + "' started at " + ip + ":" + port);
             Thread.sleep(500);
-            MainClientUI.launchUI(ip, port, username, true);  // isManager = true
+            RemoteWhiteBoards remote = RemoteHandler.getRemoteWhiteBoards(ip, port);
+            remote.addUser(username + "(manager)");
+            MainClientUI.launchUI(ip, port, username, true, remote);  // isManager = true
         } catch (Exception e) {
             e.printStackTrace();
         }

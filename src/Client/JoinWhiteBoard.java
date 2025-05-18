@@ -1,6 +1,8 @@
 package Client;
 
 import Client.ClientUI.MainClientUI;
+import Client.ClientUI.RemoteHandler;
+import RMI.RemoteWhiteBoards;
 
 public class JoinWhiteBoard {
     public static void main(String[] args) {
@@ -15,7 +17,9 @@ public class JoinWhiteBoard {
 
         try {
             System.out.println("Joining whiteboard as '" + username + "'...");
-            MainClientUI.launchUI(ip, port, username, false);  // isManager = false
+            RemoteWhiteBoards remote = RemoteHandler.getRemoteWhiteBoards(ip, port);
+            remote.addUser(username);
+            MainClientUI.launchUI(ip, port, username, false, remote);  // isManager = false
         } catch (Exception e) {
             e.printStackTrace();
         }

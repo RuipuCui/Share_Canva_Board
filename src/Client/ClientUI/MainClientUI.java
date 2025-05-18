@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainClientUI {
-    public static void launchUI(String ip, int port, String username, boolean isManager) {
+    public static void launchUI(String ip, int port, String username, boolean isManager, RemoteWhiteBoards remote) {
         SwingUtilities.invokeLater(() -> {
             try {
-                RemoteWhiteBoards remote = RemoteHandler.getRemoteWhiteBoards(ip, port);
+                //RemoteWhiteBoards remote = RemoteHandler.getRemoteWhiteBoards(ip, port);
                 JFrame frame = new JFrame("Java Drawing Canvas");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setSize(1200, 800);
@@ -39,6 +39,9 @@ public class MainClientUI {
                 sidebar.add(new FilePanel(tabbedPane, frame));
                 sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
                 sidebar.add(new ChatPanel(remote, username));
+                sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
+                sidebar.add(new CollaboratorPanel(remote));
+
 
 
                 frame.add(sidebar, BorderLayout.WEST);
