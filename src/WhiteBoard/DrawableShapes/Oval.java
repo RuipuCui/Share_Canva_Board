@@ -1,6 +1,7 @@
 package WhiteBoard.DrawableShapes;
 
 import java.awt.*;
+import java.awt.Rectangle;
 import java.awt.geom.Ellipse2D;
 
 public class Oval extends DrawableShape {
@@ -22,4 +23,27 @@ public class Oval extends DrawableShape {
         g2.setColor(color);
         g2.draw(oval);
     }
+
+    @Override
+    public boolean containsPoint(Point p) {
+        return oval.contains(p);
+    }
+
+    @Override
+    public boolean intersectsCircle(Point center, int radius) {
+        // Use the shape's outline as a stroke
+        Stroke stroke = new BasicStroke(2); // thickness of oval border, adjust if needed
+        Shape strokedOval = stroke.createStrokedShape(oval);
+
+        // Create eraser circle shape
+        Ellipse2D eraserCircle = new Ellipse2D.Double(
+                center.x - radius, center.y - radius,
+                radius * 2.0, radius * 2.0
+        );
+
+        return strokedOval.intersects(eraserCircle.getBounds2D());
+    }
+
+
+
 }

@@ -1,6 +1,8 @@
 package WhiteBoard.DrawableShapes;
 
 import java.awt.*;
+import java.awt.Rectangle;
+import java.awt.geom.Ellipse2D;
 
 public class Triangle extends DrawableShape {
     private Polygon triangle = new Polygon();
@@ -29,4 +31,27 @@ public class Triangle extends DrawableShape {
         g2.setColor(color);
         g2.draw(triangle);
     }
+
+    @Override
+    public boolean containsPoint(Point p) {
+        return triangle.contains(p);
+    }
+
+    @Override
+    public boolean intersectsCircle(Point center, int radius) {
+        // Create a stroked shape that represents the visible border
+        Stroke stroke = new BasicStroke(2); // Adjust stroke width if needed
+        Shape strokedRect = stroke.createStrokedShape(triangle);
+
+        // Create the eraser circle shape
+        Ellipse2D eraserCircle = new Ellipse2D.Double(
+                center.x - radius, center.y - radius,
+                radius * 2.0, radius * 2.0
+        );
+
+        return strokedRect.intersects(eraserCircle.getBounds2D());
+    }
+
+
+
 }

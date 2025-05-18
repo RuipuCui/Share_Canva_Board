@@ -1,6 +1,7 @@
 package WhiteBoard.DrawableShapes;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
 public class Rectangle extends DrawableShape {
@@ -22,4 +23,27 @@ public class Rectangle extends DrawableShape {
         g2.setColor(color);
         g2.draw(rect);
     }
+
+    @Override
+    public boolean containsPoint(Point p) {
+        return rect.contains(p);
+    }
+
+    @Override
+    public boolean intersectsCircle(Point center, int radius) {
+        // Create a stroked shape that represents the visible border
+        Stroke stroke = new BasicStroke(2); // Adjust stroke width if needed
+        Shape strokedRect = stroke.createStrokedShape(rect);
+
+        // Create the eraser circle shape
+        Ellipse2D eraserCircle = new Ellipse2D.Double(
+                center.x - radius, center.y - radius,
+                radius * 2.0, radius * 2.0
+        );
+
+        return strokedRect.intersects(eraserCircle.getBounds2D());
+    }
+
+
+
 }

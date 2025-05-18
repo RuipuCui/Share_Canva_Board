@@ -70,4 +70,8 @@ public class WhiteBoard extends UnicastRemoteObject implements RemoteWhiteBoard 
         }
     }
 
+    public synchronized void removeShape(DrawableShape shape) {
+        shapes.removeIf(s -> s.getId().equals(shape.getId()));
+    }
+
 }

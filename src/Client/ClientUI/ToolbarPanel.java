@@ -14,15 +14,49 @@ public class ToolbarPanel extends JPanel {
         setBackground(new Color(245, 245, 245));
         setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 
-        String[] tools = {"Freehand", "Line", "Rectangle", "Oval", "Triangle"};
+        String[] tools = {"Freehand", "Line", "Rectangle", "Oval", "Triangle", "Eraser"};
         for (String tool : tools) {
             JButton btn = new JButton(tool);
-            btn.addActionListener(e -> {
-                WhiteBoardUI selected = (WhiteBoardUI) tabbedPane.getSelectedComponent();
-                selected.setTool(tool);
-            });
+
+            if ("Eraser".equals(tool)) {
+                btn.addActionListener(e -> {
+                    WhiteBoardUI selected = (WhiteBoardUI) tabbedPane.getSelectedComponent();
+                    selected.setTool("Eraser");
+
+                    // Create eraser size chooser popup
+                    JSlider slider = new JSlider(5, 50, selected.getEraserSize());
+                    slider.setMajorTickSpacing(20);
+                    slider.setMinorTickSpacing(5);
+                    slider.setPaintTicks(true);
+                    slider.setPaintLabels(true);
+
+                    JPanel panel = new JPanel(new BorderLayout());
+                    panel.add(new JLabel("Eraser Size:"), BorderLayout.NORTH);
+                    panel.add(slider, BorderLayout.CENTER);
+
+                    int result = JOptionPane.showConfirmDialog(
+                            this,
+                            panel,
+                            "Select Eraser Size",
+                            JOptionPane.OK_CANCEL_OPTION,
+                            JOptionPane.PLAIN_MESSAGE
+                    );
+
+                    if (result == JOptionPane.OK_OPTION) {
+                        selected.setEraserSize(slider.getValue());
+                    }
+                });
+
+            } else {
+                btn.addActionListener(e -> {
+                    WhiteBoardUI selected = (WhiteBoardUI) tabbedPane.getSelectedComponent();
+                    selected.setTool(tool);
+                });
+            }
+
             add(btn);
         }
+
 
         JButton newBoardBtn = getNewBoardBtn(remoteWhiteBoards, whiteBoards, tabbedPane);
         add(Box.createHorizontalStrut(20));

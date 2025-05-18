@@ -21,6 +21,9 @@ public class WhiteBoardUI extends JPanel {
     private String currentTool = "Freehand";
     private Point startPoint;
     private RemoteWhiteBoard remoteWhiteBoard;
+    private int eraserSize = 10;
+    private Point mousePosition = null;
+
 
     public WhiteBoardUI(RemoteWhiteBoard remoteWhiteBoard) {
         setBackground(Color.WHITE);
@@ -29,6 +32,11 @@ public class WhiteBoardUI extends JPanel {
         MouseAdapter mouseHandler = new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 startPoint = e.getPoint();
+                if ("Eraser".equals(currentTool)) {
+                    return;
+                }
+
+
                 switch (currentTool) {
                     case "Freehand":
                         currentShape = new Path();
@@ -50,6 +58,32 @@ public class WhiteBoardUI extends JPanel {
             }
 
             public void mouseDragged(MouseEvent e) {
+                mousePosition = e.getPoint();
+
+                if ("Eraser".equals(currentTool)) {
+                    try {
+                        List<DrawableShape> shapes = remoteWhiteBoard.getShapes();
+                        List<DrawableShape> toRemove = new ArrayList<>();
+                        Point center = mousePosition;
+
+                        for (DrawableShape shape : shapes) {
+                            if (shape.intersectsCircle(center, eraserSize)) {
+                                toRemove.add(shape);
+                            }
+                        }
+
+                        for (DrawableShape s : toRemove) {
+                            remoteWhiteBoard.removeShape(s);
+                        }
+
+                    } catch (RemoteException ex) {
+                        ex.printStackTrace();
+                    }
+                    repaint();
+                    return;
+                }
+                //repaint();
+
                 if (currentShape != null) {
                     Point currentPoint = e.getPoint();
                     if (currentShape instanceof Path) {
@@ -71,6 +105,11 @@ public class WhiteBoardUI extends JPanel {
                     currentShape = null;
                     repaint();
                     //saveCanvasToFile("CanvasFile/Canvas_1.dat");
+                }
+
+                if ("Eraser".equals(currentTool)) {
+                    mousePosition = null;  // 💡 Hide eraser circle
+                    repaint();
                 }
             }
         };
@@ -98,6 +137,16 @@ public class WhiteBoardUI extends JPanel {
         if (currentShape != null) {
             currentShape.draw(g2);
         }
+
+        if ("Eraser".equals(currentTool) && mousePosition != null) {
+            g2.setColor(Color.BLACK);
+            g2.setStroke(new BasicStroke(1));
+            int diameter = eraserSize * 2;
+            int x = mousePosition.x - eraserSize;
+            int y = mousePosition.y - eraserSize;
+            g2.drawOval(x, y, diameter, diameter);
+        }
+
     }
 
     public void saveCanvasToFile(String path) throws RemoteException {
@@ -114,4 +163,12 @@ public class WhiteBoardUI extends JPanel {
         this.remoteWhiteBoard.exportAsImage(path, format, getWidth(), getHeight());
     }
 
+    public int getEraserSize() {
+        return eraserSize;
+    }
+
+    public void setEraserSize(int newSize) {
+        this.eraserSize = newSize;
+        repaint();
+    }
 }

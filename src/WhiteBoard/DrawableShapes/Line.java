@@ -17,4 +17,16 @@ public class Line extends DrawableShape {
         g2.setColor(color);
         g2.draw(line);
     }
+
+    @Override
+    public boolean containsPoint(Point p) {
+        return line.contains(p);
+    }
+
+    public boolean intersectsCircle(Point center, int radius) {
+        double dist = line.ptSegDist(center);
+        return dist <= radius;
+    }
+
+
 }
