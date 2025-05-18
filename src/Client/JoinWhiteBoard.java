@@ -19,6 +19,7 @@ public class JoinWhiteBoard {
             System.out.println("Joining whiteboard as '" + username + "'...");
             RemoteWhiteBoards remote = RemoteHandler.getRemoteWhiteBoards(ip, port);
             remote.addUser(username);
+            remote.sendGroupMessage("Welcome user " + username + " join!");
             MainClientUI.launchUI(ip, port, username, false, remote);  // isManager = false
         } catch (Exception e) {
             e.printStackTrace();

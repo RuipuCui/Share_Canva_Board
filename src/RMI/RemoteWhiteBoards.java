@@ -15,4 +15,5 @@ public interface RemoteWhiteBoards extends Remote {
     public List<String> getChatMessages() throws RemoteException;
     public abstract boolean addUser(String username) throws RemoteException;
     public abstract List<String> getUsers() throws RemoteException;
+    public abstract void sendGroupMessage(String message) throws RemoteException;
 }

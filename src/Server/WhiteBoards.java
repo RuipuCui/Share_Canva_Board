@@ -44,6 +44,10 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
         this.chat.add(name + ": " + message);
     }
 
+    public synchronized void sendGroupMessage(String message){
+        this.chat.add("System Message: " + message);
+    }
+
     public synchronized List<String> getChatMessages(){
         return this.chat;
     }
@@ -59,5 +63,6 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
     public synchronized List<String> getUsers(){
         return users;
     }
+
 
 }
