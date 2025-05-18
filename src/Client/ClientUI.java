@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientUI {
-    public static void main(String[] args) {
+    public static void launchUI(String ip, int port, String username, boolean isManager) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Java Drawing Canvas");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -24,22 +24,26 @@ public class ClientUI {
             JTabbedPane tabbedPane = new JTabbedPane();
             frame.add(tabbedPane, BorderLayout.CENTER);
 
+            //System.out.println("111");
             RemoteWhiteBoards remoteWhiteBoards;
-            RemoteWhiteBoard firstBoard;
+            List<WhiteBoardUI> whiteBoardUIS = new ArrayList<>();
             try {
-                remoteWhiteBoards = RemoteHandler.getRemoteWhiteBoards();
-                firstBoard = remoteWhiteBoards.getOneWhiteBoard(0);
+                remoteWhiteBoards = RemoteHandler.getRemoteWhiteBoards(ip, port);
+                int numBoards = remoteWhiteBoards.getWhiteBoardNum();
+
+                for (int i = 0; i < numBoards; i++) {
+                    RemoteWhiteBoard board = remoteWhiteBoards.getOneWhiteBoard(i);
+                    WhiteBoardUI ui = new WhiteBoardUI(board);
+                    whiteBoardUIS.add(ui);
+                    tabbedPane.addTab("Board " + (i + 1), ui);
+                }
+
             } catch (RemoteException | NotBoundException e) {
+                throw new RuntimeException("Failed to connect to remote whiteboards", e);
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
-            List<WhiteBoardUI> whiteBoardUIS = new ArrayList<>();
-            whiteBoardUIS.add(new WhiteBoardUI(firstBoard));
-
-            // === Initial Board ===
-            //WhiteBoards whiteBoards = new WhiteBoards();
-
-            tabbedPane.addTab("Board " + whiteBoardUIS.size(), whiteBoardUIS.getFirst());
 
             // === Top Tool Bar ===
             JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
@@ -58,24 +62,7 @@ public class ClientUI {
                 topBar.add(btn);
             }
 
-            JButton newBoardBtn = new JButton("+ New Board");
-            newBoardBtn.setFocusPainted(false);
-            newBoardBtn.setPreferredSize(new Dimension(120, 30));
-            newBoardBtn.addActionListener(e -> {
-                int num = 0;
-                RemoteWhiteBoard currentBoard;
-                try {
-                    remoteWhiteBoards.newWhiteBoard();
-                    num = remoteWhiteBoards.getWhiteBoardNum();
-                    currentBoard = remoteWhiteBoards.getOneWhiteBoard(num - 1);
-                } catch (RemoteException ex) {
-                    throw new RuntimeException(ex);
-                }
-
-                whiteBoardUIS.add(new WhiteBoardUI(currentBoard));
-                tabbedPane.addTab("Board " + num, whiteBoardUIS.get(num - 1));
-                tabbedPane.setSelectedComponent(whiteBoardUIS.get(num - 1));
-            });
+            JButton newBoardBtn = getNewBoardBtn(remoteWhiteBoards, whiteBoardUIS, tabbedPane);
             topBar.add(Box.createHorizontalStrut(20));
             topBar.add(newBoardBtn);
 
@@ -92,68 +79,11 @@ public class ClientUI {
             fileLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
             fileLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            JButton saveBtn = new JButton("Save Canvas");
-            saveBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
-            saveBtn.setMaximumSize(new Dimension(200, 30));
-            saveBtn.addActionListener(e -> {
-                WhiteBoardUI canvas = (WhiteBoardUI) tabbedPane.getSelectedComponent();
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setDialogTitle("Save Canvas");
-                if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
-                    String path = fileChooser.getSelectedFile().getAbsolutePath();
-                    try {
-                        canvas.saveCanvasToFile(path);
-                    } catch (RemoteException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            });
+            JButton saveBtn = getSaveBtn(tabbedPane, frame);
 
-            JButton loadBtn = new JButton("Load Canvas");
-            loadBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
-            loadBtn.setMaximumSize(new Dimension(200, 30));
-            loadBtn.addActionListener(e -> {
-                WhiteBoardUI canvas = (WhiteBoardUI) tabbedPane.getSelectedComponent();
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setDialogTitle("Load Canvas");
-                if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
-                    String path = fileChooser.getSelectedFile().getAbsolutePath();
-                    try {
-                        canvas.loadCanvasFromFile(path);
-                    } catch (RemoteException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            });
+            JButton loadBtn = getLoadBtn(tabbedPane, frame);
 
-            JButton exportBtn = new JButton("Export Image As");
-            exportBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
-            exportBtn.setMaximumSize(new Dimension(200, 30));
-            exportBtn.addActionListener(e -> {
-                WhiteBoardUI canvas = (WhiteBoardUI) tabbedPane.getSelectedComponent();
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setDialogTitle("Export as Image");
-                fileChooser.setAcceptAllFileFilterUsed(false);
-                fileChooser.addChoosableFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("PNG Image (*.png)", "png"));
-                fileChooser.addChoosableFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("JPEG Image (*.jpg)", "jpg", "jpeg"));
-
-                if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
-                    String path = fileChooser.getSelectedFile().getAbsolutePath();
-                    String format = "png";
-                    String selectedExt = ((javax.swing.filechooser.FileNameExtensionFilter) fileChooser.getFileFilter()).getExtensions()[0];
-                    if (selectedExt.equals("jpg") || selectedExt.equals("jpeg")) {
-                        format = "jpg";
-                    }
-                    if (!path.toLowerCase().endsWith("." + format)) {
-                        path += "." + format;
-                    }
-                    try {
-                        canvas.exportAsImage(path, format);
-                    } catch (RemoteException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            });
+            JButton exportBtn = getExportBtn(tabbedPane, frame);
 
             sidebar.add(fileLabel);
             sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -185,8 +115,132 @@ public class ClientUI {
             sidebar.add(chatScroll);
 
             frame.add(sidebar, BorderLayout.WEST);
+            // === Polling thread to detect new whiteboards added on the server ===
+            new Thread(() -> {
+                while (true) {
+                    try {
+                        Thread.sleep(1000);  // Poll every second (tune as needed)
+
+                        int remoteNum = remoteWhiteBoards.getWhiteBoardNum();
+                        int localNum = whiteBoardUIS.size();
+
+                        if (remoteNum > localNum) {
+                            for (int i = localNum; i < remoteNum; i++) {
+                                RemoteWhiteBoard board = remoteWhiteBoards.getOneWhiteBoard(i);
+                                WhiteBoardUI ui = new WhiteBoardUI(board);
+
+                                int boardIndex = i + 1;
+                                SwingUtilities.invokeLater(() -> {
+                                    whiteBoardUIS.add(ui);
+                                    tabbedPane.addTab("Board " + boardIndex, ui);
+                                });
+                            }
+                        }
+
+                    } catch (RemoteException | InterruptedException e) {
+                        System.err.println("Polling error: " + e.getMessage());
+                        break; // optionally retry instead of exiting
+                    }
+                }
+            }).start();
+
             frame.setVisible(true);
         });
+    }
+
+    private static JButton getExportBtn(JTabbedPane tabbedPane, JFrame frame) {
+        JButton exportBtn = new JButton("Export Image As");
+        exportBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+        exportBtn.setMaximumSize(new Dimension(200, 30));
+        exportBtn.addActionListener(e -> {
+            WhiteBoardUI canvas = (WhiteBoardUI) tabbedPane.getSelectedComponent();
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Export as Image");
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            fileChooser.addChoosableFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("PNG Image (*.png)", "png"));
+            fileChooser.addChoosableFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("JPEG Image (*.jpg)", "jpg", "jpeg"));
+
+            if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+                String path = fileChooser.getSelectedFile().getAbsolutePath();
+                String format = "png";
+                String selectedExt = ((javax.swing.filechooser.FileNameExtensionFilter) fileChooser.getFileFilter()).getExtensions()[0];
+                if (selectedExt.equals("jpg") || selectedExt.equals("jpeg")) {
+                    format = "jpg";
+                }
+                if (!path.toLowerCase().endsWith("." + format)) {
+                    path += "." + format;
+                }
+                try {
+                    canvas.exportAsImage(path, format);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+        return exportBtn;
+    }
+
+    private static JButton getLoadBtn(JTabbedPane tabbedPane, JFrame frame) {
+        JButton loadBtn = new JButton("Load Canvas");
+        loadBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+        loadBtn.setMaximumSize(new Dimension(200, 30));
+        loadBtn.addActionListener(e -> {
+            WhiteBoardUI canvas = (WhiteBoardUI) tabbedPane.getSelectedComponent();
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Load Canvas");
+            if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
+                String path = fileChooser.getSelectedFile().getAbsolutePath();
+                try {
+                    canvas.loadCanvasFromFile(path);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+        return loadBtn;
+    }
+
+    private static JButton getSaveBtn(JTabbedPane tabbedPane, JFrame frame) {
+        JButton saveBtn = new JButton("Save Canvas");
+        saveBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+        saveBtn.setMaximumSize(new Dimension(200, 30));
+        saveBtn.addActionListener(e -> {
+            WhiteBoardUI canvas = (WhiteBoardUI) tabbedPane.getSelectedComponent();
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Save Canvas");
+            if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+                String path = fileChooser.getSelectedFile().getAbsolutePath();
+                try {
+                    canvas.saveCanvasToFile(path);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+        return saveBtn;
+    }
+
+    private static JButton getNewBoardBtn(RemoteWhiteBoards remoteWhiteBoards, List<WhiteBoardUI> whiteBoardUIS, JTabbedPane tabbedPane) {
+        JButton newBoardBtn = new JButton("+ New Board");
+        newBoardBtn.setFocusPainted(false);
+        newBoardBtn.setPreferredSize(new Dimension(120, 30));
+        newBoardBtn.addActionListener(e -> {
+            int num = 0;
+            RemoteWhiteBoard currentBoard;
+            try {
+                remoteWhiteBoards.newWhiteBoard();
+                Thread.sleep(100);
+                num = remoteWhiteBoards.getWhiteBoardNum();
+                currentBoard = remoteWhiteBoards.getOneWhiteBoard(num - 1);
+            } catch (RemoteException | InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            whiteBoardUIS.add(new WhiteBoardUI(currentBoard));
+            tabbedPane.addTab("Board " + num, whiteBoardUIS.get(num - 1));
+            tabbedPane.setSelectedComponent(whiteBoardUIS.get(num - 1));
+        });
+        return newBoardBtn;
     }
 }
 

@@ -19,25 +19,25 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
         newWhiteBoard();
     }
 
-    public void newWhiteBoard() throws RemoteException {
+    public synchronized void newWhiteBoard() throws RemoteException {
         WhiteBoard whiteBoard = new WhiteBoard();
         this.whiteBoards.add(whiteBoard);
         whiteBoardNum ++;
     }
 
-    public void removeWhiteBoard(){
+    public synchronized void removeWhiteBoard(){
 
     }
 
-    public List<RemoteWhiteBoard> getWhiteBoards(){
+    public synchronized List<RemoteWhiteBoard> getWhiteBoards(){
         return this.whiteBoards;
     }
 
-    public int getWhiteBoardNum(){
+    public synchronized int getWhiteBoardNum(){
         return this.whiteBoardNum;
     }
 
-    public RemoteWhiteBoard getOneWhiteBoard(int index){
+    public synchronized RemoteWhiteBoard getOneWhiteBoard(int index){
         return this.whiteBoards.get(index);
     }
 

@@ -29,7 +29,7 @@ public class WhiteBoard extends UnicastRemoteObject implements RemoteWhiteBoard 
         return new ArrayList<>(shapes); // defensive copy
     }
 
-    public void saveCanvasToFile(String path) {
+    public synchronized void saveCanvasToFile(String path) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path))) {
             oos.writeObject(shapes);
             System.out.println("Canvas saved.");
@@ -39,7 +39,7 @@ public class WhiteBoard extends UnicastRemoteObject implements RemoteWhiteBoard 
     }
 
     @SuppressWarnings("unchecked")
-    public void loadCanvasFromFile(String path) {
+    public synchronized void loadCanvasFromFile(String path) {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path))) {
             shapes = (List<DrawableShape>) ois.readObject();
             //repaint();
@@ -49,7 +49,7 @@ public class WhiteBoard extends UnicastRemoteObject implements RemoteWhiteBoard 
         }
     }
 
-    public void exportAsImage(String path, String format, int width, int height) {
+    public synchronized void exportAsImage(String path, String format, int width, int height) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = image.createGraphics();
 
