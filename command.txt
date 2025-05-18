@@ -1,6 +1,11 @@
 javac -d bin $(find src -name "*.java")
 java -cp bin -Djava.rmi.server.codebase=file:./bin/RMIServer Server.RMIServer 127.0.0.1 1099
-java -cp bin -Djava.rmi.server.codebase=file:./bin/ Client.CreateWhiteBoard 127.0.0.1 1010 Alice
-java -cp bin -Djava.rmi.server.codebase=file:./bin/ Client.JoinWhiteBoard 127.0.0.1 1010 Bob
+java -cp bin -Djava.rmi.server.codebase=file:./bin/ Client.CreateWhiteBoard
+
+jar cfe Server.jar Server.RMIServer -C bin .
+jar cfe Client.jar Client.CreateWhiteBoard -C bin .
+
+java -Djava.rmi.server.codebase=file:./Server.jar -jar Server.jar 127.0.0.1 1099
+java -Djava.rmi.server.codebase=file:./Client.jar -jar Client.jar
 
 
