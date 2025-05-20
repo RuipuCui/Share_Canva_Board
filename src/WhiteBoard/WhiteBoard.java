@@ -11,9 +11,14 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class WhiteBoard extends UnicastRemoteObject implements RemoteWhiteBoard {
     private List<DrawableShape> shapes = new ArrayList<>();
+    private final UUID id = UUID.randomUUID();
+    public UUID getId() {
+        return id;
+    }
 
     public WhiteBoard() throws RemoteException {
         super();

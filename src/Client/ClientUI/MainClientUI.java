@@ -31,7 +31,7 @@ public class MainClientUI {
                 for (int i = 0; i < count; i++) {
                     WhiteBoardUI ui = new WhiteBoardUI(remote.getOneWhiteBoard(i));
                     whiteBoards.add(ui);
-                    tabbedPane.addTab("Board " + (i + 1), ui);
+                    tabbedPane.addTab("Board Tab", ui);
                     new Thread(new WhiteboardRepaintPoller(ui, 100)).start();
                 }
 

@@ -27,7 +27,15 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
         whiteBoardNum ++;
     }
 
-    public synchronized void removeWhiteBoard(){
+    public synchronized void removeWhiteBoard(RemoteWhiteBoard board){
+        whiteBoards.removeIf(s -> {
+            try {
+                whiteBoardNum --;
+                return s.getId().equals(board.getId());
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public synchronized List<RemoteWhiteBoard> getWhiteBoards(){
@@ -35,7 +43,7 @@ public class WhiteBoards extends UnicastRemoteObject implements RemoteWhiteBoard
     }
 
     public synchronized int getWhiteBoardNum(){
-        return this.whiteBoardNum;
+        return this.whiteBoards.size();
     }
 
     public synchronized RemoteWhiteBoard getOneWhiteBoard(int index){

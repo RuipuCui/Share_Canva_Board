@@ -25,14 +25,16 @@ public class WhiteboardPoller implements Runnable {
             try {
                 Thread.sleep(1000);
                 int remoteCount = remote.getWhiteBoardNum();
-                if (remoteCount > localList.size()) {
-                    for (int i = localList.size(); i < remoteCount; i++) {
+                //int currentMaxBoardNum = localList.size();
+                if (remoteCount != localList.size()) {
+                    tabbedPane.removeAll();
+                    localList.clear();
+                    for (int i = 0; i < remoteCount; i++) {
                         RemoteWhiteBoard board = remote.getOneWhiteBoard(i);
                         WhiteBoardUI ui = new WhiteBoardUI(board);
-                        int index = i;
                         SwingUtilities.invokeLater(() -> {
                             localList.add(ui);
-                            tabbedPane.addTab("Board " + (index + 1), ui);
+                            tabbedPane.addTab("Board Tab", ui);
                         });
                     }
                 }

@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 public interface RemoteWhiteBoard extends Remote {
@@ -18,5 +19,6 @@ public interface RemoteWhiteBoard extends Remote {
     public void loadCanvasFromFile(String path)throws RemoteException;
     public void exportAsImage(String path, String format, int width, int height) throws RemoteException;
     public void removeShape(DrawableShape shape) throws RemoteException;
+    public UUID getId() throws RemoteException;
 
 }

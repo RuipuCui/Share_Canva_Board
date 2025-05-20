@@ -20,7 +20,7 @@ public class WhiteBoardUI extends JPanel {
     private DrawableShape currentShape = null;
     private String currentTool = "Freehand";
     private Point startPoint;
-    private RemoteWhiteBoard remoteWhiteBoard;
+    private final RemoteWhiteBoard remoteWhiteBoard;
     private int eraserSize = 10;
     private Point mousePosition = null;
     private Color currentColor = Color.BLACK;
@@ -194,4 +194,9 @@ public class WhiteBoardUI extends JPanel {
     public void setCurrentColor(Color color){
         this.currentColor = color;
     }
+
+    public RemoteWhiteBoard getRemoteBoard() {
+        return this.remoteWhiteBoard;
+    }
+
 }
