@@ -1,17 +1,11 @@
 package Client.ClientUI;
 
-import Client.ClientUI.Poller.ChatPoller;
-import RMI.RemoteWhiteBoard;
+import Client.Poller.ChatPoller;
 import RMI.RemoteWhiteBoards;
-import Server.WhiteBoards;
 
 import javax.swing.*;
 import java.awt.*;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ChatPanel extends JPanel {
     private final JTextArea chatArea;

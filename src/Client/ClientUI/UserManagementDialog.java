@@ -1,6 +1,6 @@
 package Client.ClientUI;
 
-import Client.ClientUI.Poller.UserManagementPoller;
+import Client.Poller.UserManagementPoller;
 import RMI.RemoteWhiteBoards;
 
 import javax.swing.*;

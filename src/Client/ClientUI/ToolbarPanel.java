@@ -15,7 +15,7 @@ public class ToolbarPanel extends JPanel {
         setBackground(new Color(245, 245, 245));
         setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 
-        String[] tools = {"Freehand", "Line", "Rectangle", "Oval", "Triangle", "Eraser", "Color"};
+        String[] tools = {"Freehand", "Line", "Rectangle", "Oval", "Triangle", "Eraser", "Text", "Color"};
         for (String tool : tools) {
             JButton btn = new JButton(tool);
 

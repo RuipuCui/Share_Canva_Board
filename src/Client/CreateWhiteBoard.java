@@ -2,6 +2,7 @@ package Client;
 
 import Client.ClientUI.MainClientUI;
 import Client.ClientUI.RemoteHandler;
+import Client.Poller.WaitingApprovalPoller;
 import RMI.RemoteWhiteBoards;
 import Server.WhiteBoards;
 
@@ -111,64 +112,8 @@ public class CreateWhiteBoard {
             waitingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
             // Polling thread
-            new Thread(() -> {
-                while (true) {
-                    try {
-                        List<String> approvedUsers = remote.getUsers();
-                        List<String> waitingUsers = remote.getWaitingUsers();
+            new Thread(new WaitingApprovalPoller(remote, ip, port, username, waitingDialog)).start();
 
-                        if (approvedUsers.contains(username)) {
-                            waitingDialog.dispose();
-                            SwingUtilities.invokeLater(() ->
-                                    MainClientUI.launchUI(ip, port, username, false, remote)
-                            );
-                            break;
-                        }
-
-                        if (!waitingUsers.contains(username)) {
-                            // The user was kicked or rejected
-                            SwingUtilities.invokeLater(() -> {
-                                waitingDialog.dispose();
-                                JOptionPane.showMessageDialog(
-                                        null,
-                                        "You have been removed or rejected by the manager.",
-                                        "Access Denied",
-                                        JOptionPane.WARNING_MESSAGE
-                                );
-                                LaunchUI.createAndShow(config -> {
-                                    if (config.isManager) {
-                                        CreateWhiteBoard.launchWhiteBoard(config.ip, config.port, config.username);
-                                    } else {
-                                        joinWhiteBoard(config.ip, config.port, config.username);
-                                    }
-                                });
-                            });
-                            break;
-                        }
-
-                        Thread.sleep(1000); // Poll every second
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        SwingUtilities.invokeLater(() -> {
-                            JOptionPane.showMessageDialog(
-                                    null,
-                                    "Connection lost or manager rejected your request.",
-                                    "Connection Error",
-                                    JOptionPane.ERROR_MESSAGE
-                            );
-                            waitingDialog.dispose();
-                            LaunchUI.createAndShow(config -> {
-                                if (config.isManager) {
-                                    CreateWhiteBoard.launchWhiteBoard(config.ip, config.port, config.username);
-                                } else {
-                                    joinWhiteBoard(config.ip, config.port, config.username);
-                                }
-                            });
-                        });
-                        break;
-                    }
-                }
-            }).start();
 
             waitingDialog.setVisible(true);
 

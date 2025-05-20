@@ -37,6 +37,20 @@ public class WhiteBoardUI extends JPanel {
                     return;
                 }
 
+                if("Text".equals(currentTool)){
+                    String text = JOptionPane.showInputDialog(null, "Enter text:");
+                    if (text != null && !text.trim().isEmpty()) {
+                        currentShape = new TextShape(startPoint, text, currentColor);
+                        try {
+                            remoteWhiteBoard.addShape(currentShape);
+                        } catch (RemoteException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        currentShape = null; // Do not drag
+                        repaint();
+                    }
+                    return;
+                }
 
                 switch (currentTool) {
                     case "Freehand":

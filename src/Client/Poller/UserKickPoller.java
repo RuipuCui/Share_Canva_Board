@@ -1,4 +1,4 @@
-package Client.ClientUI.Poller;
+package Client.Poller;
 
 import Client.LaunchUI;
 import RMI.RemoteWhiteBoards;

@@ -1,12 +1,17 @@
 package Client.ClientUI;
 
-import Client.ClientUI.Poller.UserKickPoller;
-import Client.ClientUI.Poller.WhiteboardPoller;
+import Client.Poller.ManagerDisconnectPoller;
+import Client.Poller.UserKickPoller;
+import Client.Poller.WhiteboardPoller;
+import Client.Poller.WhiteboardRepaintPoller;
 import RMI.RemoteWhiteBoards;
 
 import javax.swing.*;
 import java.awt.*;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +32,7 @@ public class MainClientUI {
                     WhiteBoardUI ui = new WhiteBoardUI(remote.getOneWhiteBoard(i));
                     whiteBoards.add(ui);
                     tabbedPane.addTab("Board " + (i + 1), ui);
+                    new Thread(new WhiteboardRepaintPoller(ui, 100)).start();
                 }
 
                 frame.add(new ToolbarPanel(remote, whiteBoards, tabbedPane, remote, username), BorderLayout.NORTH);
@@ -48,9 +54,9 @@ public class MainClientUI {
 
                 new Thread(new WhiteboardPoller(remote, whiteBoards, tabbedPane)).start();
                 new Thread(new UserKickPoller(remote, username, frame)).start();
+                new Thread(new ManagerDisconnectPoller(remote, username, frame)).start();
 
                 frame.setVisible(true);
-
             } catch (Exception e) {
                 e.printStackTrace();
             }

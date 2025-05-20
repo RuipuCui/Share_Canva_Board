@@ -1,11 +1,10 @@
 package Client.ClientUI;
 
+import Client.Poller.CollaboratorPoller;
 import RMI.RemoteWhiteBoards;
 
 import javax.swing.*;
 import java.awt.*;
-import java.rmi.RemoteException;
-import java.util.List;
 
 public class CollaboratorPanel extends JPanel {
     private final JTextArea collaboratorArea;
@@ -36,19 +35,6 @@ public class CollaboratorPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // top, left, bottom, right
 
         // Periodically update list of collaborators
-        new Thread(() -> {
-            while (true) {
-                try {
-                    List<String> users = remoteWhiteBoards.getUsers(); // Assuming this method exists
-                    SwingUtilities.invokeLater(() -> {
-                        collaboratorArea.setText(String.join("\n", users));
-                    });
-                    Thread.sleep(2000);
-                } catch (RemoteException | InterruptedException e) {
-                    System.err.println("Collaborator polling error: " + e.getMessage());
-                    break;
-                }
-            }
-        }).start();
+        new Thread(new CollaboratorPoller(remoteWhiteBoards, collaboratorArea)).start();
     }
 }
